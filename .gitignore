@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Environment Variables
+.env
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS Files
+Thumbs.db
+.DS_Store
+Latish_Resume_2026.pdf
