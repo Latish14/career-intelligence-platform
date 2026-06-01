@@ -1,25 +1,30 @@
-"""
-backend/models/resume.py
 
-SQLAlchemy model for storing uploaded resumes.
+"""
+backend/models/report.py
+
+SQLAlchemy model for storing generated Career Intelligence Reports.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.database.base import Base
 
 
-class Resume(Base):
+class Report(Base):
     """
-    Uploaded resume associated with a user.
+    Generated career intelligence report.
+
+    Stores structured report output in PostgreSQL JSONB format.
     """
 
-    __tablename__ = "resumes"
+    __tablename__ = "reports"
 
     id: Mapped[int] = mapped_column(
         primary_key=True,
@@ -32,17 +37,18 @@ class Resume(Base):
         index=True,
     )
 
-    filename: Mapped[str] = mapped_column(
-        String(255),
+    resume_id: Mapped[int] = mapped_column(
+        ForeignKey("resumes.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    report_json: Mapped[dict[str, Any]] = mapped_column(
+        JSONB,
         nullable=False,
     )
 
-    raw_text: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-    )
-
-    uploaded_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
@@ -53,22 +59,12 @@ class Resume(Base):
     # ------------------------------------------------------------------
     user = relationship(
         "User",
-        back_populates="resumes",
+        back_populates="reports",
     )
 
-    reports = relationship(
-        "Report",
-        back_populates="resume",
-        cascade="all, delete-orphan",
-    )
-    reports = relationship(
-        "Report",
-        back_populates="resume",
-        cascade="all, delete-orphan",
-    )
-    user = relationship(
-        "User",
-        back_populates="resumes",
+    resume = relationship(
+        "Resume",
+        back_populates="reports",
     )
 
     # ------------------------------------------------------------------
@@ -76,9 +72,9 @@ class Resume(Base):
     # ------------------------------------------------------------------
     def __repr__(self) -> str:
         return (
-            f"Resume("
+            f"Report("
             f"id={self.id}, "
             f"user_id={self.user_id}, "
-            f"filename='{self.filename}'"
+            f"resume_id={self.resume_id}"
             f")"
         )
