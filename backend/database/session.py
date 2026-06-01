@@ -16,7 +16,7 @@ from collections.abc import Generator
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from database.connection import engine
+from backend.database.connection import engine
 
 
 # -----------------------------------------------------------------------------
