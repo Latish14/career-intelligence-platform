@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from backend.database.base import Base
+from database.base import Base
 
 class Skill(Base):
     __tablename__ = "skills"

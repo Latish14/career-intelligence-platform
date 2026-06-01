@@ -28,7 +28,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from backend.models.report import Report
+from models.report import Report
 
 
 logger = logging.getLogger(__name__)

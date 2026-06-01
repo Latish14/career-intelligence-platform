@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.routes.analysis_routes import router as analysis_router
 from api.routes.resume_routes import router as resume_router
+from api.routes.report_routes import router as report_router
+
+
 
 
 # -----------------------------------------------------------------------------
@@ -27,6 +30,7 @@ app = FastAPI(
     description="AI-Powered Student Career Intelligence Platform",
     version="1.0.0",
 )
+
 
 
 # -----------------------------------------------------------------------------
@@ -123,3 +127,4 @@ async def health_check():
 # -----------------------------------------------------------------------------
 app.include_router(analysis_router)
 app.include_router(resume_router)
+app.include_router(report_router)

@@ -14,7 +14,7 @@ from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.database.base import Base
+from database.base import Base
 
 
 class Report(Base):
