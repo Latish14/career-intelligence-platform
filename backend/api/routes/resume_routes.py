@@ -30,6 +30,15 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from sqlalchemy.orm import Session
+
+from database.session import get_db
+from models.resume import Resume
+from models.report import Report
+
+from repositories.resume_repository import ResumeRepository
+from repositories.report_repository import ReportRepository
+
 from services.career_report.report_generator import generate_career_report
 
 logger = logging.getLogger(__name__)
@@ -295,9 +304,10 @@ router = APIRouter(prefix="/resume", tags=["Resume"])
     },
 )
 async def upload_resume(
-    file:        Annotated[UploadFile, File(description="Resume file (.pdf or .docx)")],
-    config:      Annotated[ReportConfig, Depends(get_report_config)],
-    job_records: Annotated[list[dict],   Depends(get_job_records)],
+    file: Annotated[UploadFile, File(...)],
+    config: Annotated[ReportConfig, Depends(get_report_config)],
+    job_records: Annotated[list[dict], Depends(get_job_records)],
+    db: Session = Depends(get_db),
 ) -> CareerReportResponse:
     """
     Upload a resume (PDF or DOCX) and receive a full career intelligence report.
@@ -342,6 +352,40 @@ async def upload_resume(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=error_msg,
             )
+        
+        # ------------------------------------------------------------------
+        # Save Resume
+        # ------------------------------------------------------------------
+
+        resume_repo = ResumeRepository(db)
+
+        resume_record = Resume(
+            user_id=1,
+            filename=file.filename,
+            raw_text="TEMP_TEXT",
+        )
+
+        saved_resume = resume_repo.save_resume(
+            resume_record
+        )
+
+        # ------------------------------------------------------------------
+        # Save Report
+        # ------------------------------------------------------------------
+
+        report_repo = ReportRepository(db)
+
+        report_record = Report(
+            user_id=1,
+            resume_id=saved_resume.id,
+            report_json=report,
+        )
+
+        report_repo.save_report(
+            report_record
+        )
+        
+        
 
         # ── Step 4: serialise and return ──────────────────────────────────────
         response = _build_response(report)

@@ -27,7 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from backend.models.user import User
+from models.user import User
 
 
 # -----------------------------------------------------------------------------

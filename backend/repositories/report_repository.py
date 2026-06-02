@@ -148,8 +148,9 @@ class ReportRepository:
                 user_id,
             )
 
-            statement = select(Report).where(
-                Report.user_id == user_id
+            statement = (select(Report).where(
+                Report.user_id == user_id)
+                .order_by(Report.created_at.desc())
             )
 
             result = self.db.scalars(statement)

@@ -61,15 +61,7 @@ class Resume(Base):
         back_populates="resume",
         cascade="all, delete-orphan",
     )
-    reports = relationship(
-        "Report",
-        back_populates="resume",
-        cascade="all, delete-orphan",
-    )
-    user = relationship(
-        "User",
-        back_populates="resumes",
-    )
+    
 
     # ------------------------------------------------------------------
     # Representation
