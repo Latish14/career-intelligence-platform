@@ -25,6 +25,7 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Annotated
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -40,6 +41,11 @@ from repositories.resume_repository import ResumeRepository
 from repositories.report_repository import ReportRepository
 
 from services.career_report.report_generator import generate_career_report
+from tinydb import TinyDB
+
+from services.skill_engine.skill_extractor import (
+    extract_skills,
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -138,12 +144,68 @@ def get_report_config() -> ReportConfig:
 
 def get_job_records() -> list[dict]:
     """
-    Dependency that supplies job records to the pipeline.
-
-    In production, replace this with a call to job_processor.query_jobs()
-    or a cached data layer. Kept stateless here per requirements.
+    Load jobs from jobs.json and convert them into
+    the format expected by report_generator.
     """
-    return []
+
+    jobs_path = (
+        Path(__file__).resolve().parents[3]
+        / "job_engine"
+        / "jobs.json"
+    )
+
+    print("JOBS PATH:", jobs_path)
+
+    db = TinyDB(str(jobs_path))
+
+    # Read from the TinyDB table named "jobs"
+    jobs_table = db.table("jobs")
+
+    all_jobs = jobs_table.all()
+
+    print("TOTAL JOBS IN JSON:", len(all_jobs))
+
+    job_records = []
+
+    for job in all_jobs:
+
+        description = job.get(
+            "description",
+            "",
+        )
+
+        result = extract_skills(
+            description,
+        )
+
+        skills = [
+            skill["skill"]
+            for skill in result["skills"]
+        ]
+
+        if skills:
+            job_records.append(
+                {
+                    "job_id": job.get(
+                        "job_id",
+                        "",
+                    ),
+                    "skills": skills,
+                }
+            )
+
+    print(
+        "TOTAL JOB RECORDS:",
+        len(job_records),
+    )
+
+    if job_records:
+        print(
+            "FIRST RECORD:",
+            job_records[0],
+        )
+
+    return job_records
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

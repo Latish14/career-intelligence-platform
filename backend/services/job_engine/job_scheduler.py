@@ -59,9 +59,9 @@ from typing import TypedDict
 
 import schedule
 
-from job_engine.job_scraper  import JobScraper
-from job_engine.job_cleaner  import clean_jobs
-from job_engine.job_processor import JobProcessor
+from services.job_engine.job_scraper  import JobScraper
+from services.job_engine.job_cleaner  import clean_jobs
+from services.job_engine.job_processor import JobProcessor
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -397,8 +397,8 @@ def _build_cli() -> argparse.ArgumentParser:
     p.add_argument("--location",     default="",
                    help="Location hint (not used by RemoteOK)")
     p.add_argument("--sources",      nargs="+",
-                   default=["adzuna", "jsearch", "remoteok"],
-                   choices=["adzuna", "jsearch", "remoteok"],
+                   default=["remoteok"],
+                   choices=["remoteok"],
                    help="Sources to scrape")
     p.add_argument("--max-per-source", type=int, default=50,
                    dest="max_per_source")

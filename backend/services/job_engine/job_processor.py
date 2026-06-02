@@ -60,7 +60,7 @@ from tinydb import Query, TinyDB
 from tinydb.storages import JSONStorage
 from tinydb.middlewares import CachingMiddleware
 
-from job_engine.job_cleaner import CleanJob
+from services.job_engine.job_cleaner import CleanJob
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -148,7 +148,7 @@ class JobProcessor:
 
         self._db = TinyDB(
             str(self._path),
-            storage=CachingMiddleware(JSONStorage),
+            storage=JSONStorage,
             indent=2,
             ensure_ascii=False,
         )
@@ -205,6 +205,10 @@ class JobProcessor:
         -------
         ProcessResult with inserted / skipped / failed counts.
         """
+        
+        
+        
+        
         if not isinstance(jobs, list):
             msg = f"process_batch expects list, got {type(jobs).__name__}"
             logger.error(msg)
@@ -227,7 +231,7 @@ class JobProcessor:
         for job in jobs:
             try:
                 fp = job.get("fingerprint", "")
-
+    
                 if not fp:
                     logger.warning(
                         "Job missing fingerprint, skipping: %s", job.get("job_id")
@@ -244,7 +248,9 @@ class JobProcessor:
                     continue
 
                 doc = self._to_document(job, batch_id)
+        
                 self._table.insert(doc)
+            
                 inserted += 1
                 logger.debug(
                     "Inserted: job_id=%s  title=%r  source=%s",
@@ -259,7 +265,8 @@ class JobProcessor:
                 )
 
         # Flush CachingMiddleware writes to disk
-        self._db.storage.flush()
+        if hasattr(self._db.storage, "flush"):
+            self._db.storage.flush()
 
         logger.info(
             "process_batch END: batch_id=%s  inserted=%d  skipped=%d  failed=%d",
@@ -498,7 +505,8 @@ class JobProcessor:
             )
             count = len(removed_ids)
             self._table.remove(Job._inserted_at < cutoff)
-            self._db.storage.flush()
+            if hasattr(self._db.storage, "flush"):
+                self._db.storage.flush()
 
             logger.info(
                 "purge_old: removed %d records older than %d days (cutoff=%s)",
@@ -515,7 +523,8 @@ class JobProcessor:
     def close(self) -> None:
         """Flush and close the database."""
         try:
-            self._db.storage.flush()
+            if hasattr(self._db.storage, "flush"):
+                self._db.storage.flush()
         except Exception:               # noqa: BLE001
             pass
         self._db.close()

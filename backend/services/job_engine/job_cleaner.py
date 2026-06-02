@@ -62,7 +62,7 @@ from urllib.parse import urlparse
 
 from rapidfuzz import fuzz
 
-from job_engine.job_scraper import RawJob
+from services.job_engine.job_scraper import RawJob
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
