@@ -1,26 +1,37 @@
-// frontend/src/App.jsx
-
+import { ThemeProvider } from "./context/ThemeContext";
 import ResumeUpload from "./components/ResumeUpload";
+import ThemeToggle from "./components/ThemeToggle";
 
 function App() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "2rem",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "2rem",
-        }}
-      >
-        Career Intelligence Platform
-      </h1>
+    <ThemeProvider>
+      <div className="app">
+        <header className="app-header">
+          <div className="app-header__inner">
+            <div className="app-header__brand">
+              <div className="app-header__logo" aria-hidden="true">
+                CIP
+              </div>
+              <div>
+                <div className="app-header__title">
+                  Career Intelligence Platform
+                </div>
+                <div className="app-header__subtitle">
+                  AI-powered career insights
+                </div>
+              </div>
+            </div>
+            <ThemeToggle />
+          </div>
+        </header>
 
-      <ResumeUpload />
-    </main>
+        <main className="app-main">
+          <div className="app-main__inner">
+            <ResumeUpload />
+          </div>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }
 

@@ -1,68 +1,104 @@
-function RoleAlignmentSection({
-  roles = [],
-}) {
+import { asText, asNumber } from "../utils/normalize";
+
+const RANK_LABELS = ["Best Match", "Second Match", "Third Match"];
+const RANK_MEDALS = ["🥇", "🥈", "🥉"];
+
+function getAlignmentStyle(pct, isBest) {
+  if (isBest) {
+    return {
+      fillClass: "progress-bar__fill--accent",
+      pctClass: "role-card__pct--accent",
+    };
+  }
+  if (pct >= 70) {
+    return {
+      fillClass: "progress-bar__fill--success",
+      pctClass: "role-card__pct--success",
+    };
+  }
+  if (pct >= 40) {
+    return {
+      fillClass: "progress-bar__fill--warning",
+      pctClass: "role-card__pct--warning",
+    };
+  }
+  return {
+    fillClass: "progress-bar__fill--neutral",
+    pctClass: "role-card__pct--neutral",
+  };
+}
+
+function RoleAlignmentSection({ roles = [] }) {
+  const safeRoles = Array.isArray(roles) ? roles : [];
+
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: "12px",
-        padding: "1.5rem",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h2
-        style={{
-          textAlign: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        🎯 Career Role Alignment
-      </h2>
+    <div className="card card--elevated card--hover">
+      <div className="card__header">
+        <div className="card__header-text">
+          <h3 className="card__title">Career Role Alignment</h3>
+          <p className="card__subtitle">
+            Ranked by how well your profile fits each path
+          </p>
+        </div>
+      </div>
 
-      {roles.length === 0 ? (
-        <p style={{ textAlign: "center" }}>
-          No alignment data available.
-        </p>
+      {safeRoles.length === 0 ? (
+        <p className="card__empty">No alignment data available.</p>
       ) : (
-        roles.map((role, index) => (
-          <div
-            key={index}
-            style={{
-              marginBottom: "1rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <span>{role.role}</span>
+        <div className="role-cards" role="list" aria-label="Role alignments">
+          {safeRoles.map((role, index) => {
+            if (!role || typeof role !== "object") return null;
 
-              <span>
-                {role.alignment_pct}%
-              </span>
-            </div>
+            const pct = asNumber(role.alignment_pct, 0);
+            const roleName = asText(role.role, "Unknown Role");
+            const isBest = index === 0;
+            const { fillClass, pctClass } = getAlignmentStyle(pct, isBest);
+            const isTopThree = index < 3;
+            const displayPct = Number.isInteger(pct) ? pct : pct.toFixed(1);
 
-            <div
-              style={{
-                width: "100%",
-                height: "10px",
-                background: "#e5e7eb",
-                borderRadius: "999px",
-              }}
-            >
+            return (
               <div
-                style={{
-                  width: `${role.alignment_pct}%`,
-                  height: "100%",
-                  background: "#10b981",
-                  borderRadius: "999px",
-                }}
-              />
-            </div>
-          </div>
-        ))
+                key={`${roleName}-${index}`}
+                className={`role-card${isBest ? " role-card--best" : ""}${isTopThree && !isBest ? " role-card--ranked" : ""}`}
+                role="listitem"
+              >
+                {isBest && <div className="role-card__accent-bar" aria-hidden="true" />}
+
+                <div className="role-card__header">
+                  <div className="role-card__title-group">
+                    {isTopThree && (
+                      <span className="role-card__medal" aria-hidden="true">
+                        {RANK_MEDALS[index]}
+                      </span>
+                    )}
+                    <div>
+                      <p className="role-card__name">{roleName}</p>
+                      {isTopThree && (
+                        <p className="role-card__rank-label">{RANK_LABELS[index]}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <span className={`role-card__pct ${pctClass}`}>{displayPct}%</span>
+                </div>
+
+                <div
+                  className="progress-bar progress-bar--role"
+                  role="progressbar"
+                  aria-valuenow={pct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${roleName} alignment`}
+                >
+                  <div
+                    className={`progress-bar__fill ${fillClass}`}
+                    style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

@@ -1,143 +1,82 @@
-// frontend/src/components/ReportSummary.jsx
+import { asText, asNumber } from "../utils/normalize";
+import { getPlacementTier } from "../utils/roadmapPhases";
+
+function formatAlignment(value) {
+  const num = asNumber(value, 0);
+  return Number.isInteger(num) ? `${num}%` : `${num.toFixed(1)}%`;
+}
 
 function ReportSummary({
   candidateName,
   targetRole,
   placementScore,
   coveragePct,
+  bestMatchRole,
+  bestMatchPct,
 }) {
+  const placement = asNumber(placementScore, 0);
+  const coverage = asNumber(coveragePct, 0);
+  const placementTier = getPlacementTier(placement);
+  const recommendedRole = asText(bestMatchRole, "Not available");
+  const hasMatch = bestMatchRole != null && asText(bestMatchRole) !== "";
+
   return (
-    <div
-      style={{
-        background: "#ffffff",
-        border: "1px solid #e5e7eb",
-        borderRadius: "12px",
-        padding: "1.5rem",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        width: "100%",
-        maxWidth: "900px",
-        margin: "0 auto",
-      }}
-    >
-      <h2
-        style={{
-          margin: 0,
-          marginBottom: "1rem",
-        }}
-      >
-        Report Overview
-      </h2>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <p
-            style={{
-              margin: 0,
-              color: "#6b7280",
-              fontSize: "0.9rem",
-            }}
-          >
-            Candidate
-          </p>
-
-          <h3
-            style={{
-              marginTop: "0.25rem",
-            }}
-          >
-            {candidateName}
-          </h3>
-        </div>
-
-        <div>
-          <p
-            style={{
-              margin: 0,
-              color: "#6b7280",
-              fontSize: "0.9rem",
-            }}
-          >
-            Target Role
-          </p>
-
-          <h3
-            style={{
-              marginTop: "0.25rem",
-            }}
-          >
-            {targetRole}
-          </h3>
-        </div>
-
-        <div>
-          <p
-            style={{
-              margin: 0,
-              color: "#6b7280",
-              fontSize: "0.9rem",
-            }}
-          >
-            Skill Coverage
-          </p>
-
-          <h3
-            style={{
-              marginTop: "0.25rem",
-            }}
-          >
-            {coveragePct}%
-          </h3>
-        </div>
+    <section className="report-hero" aria-label="Career intelligence summary">
+      <div className="report-hero__header">
+        <p className="report-hero__eyebrow">Career Intelligence Report</p>
+        <p className="report-hero__candidate">{asText(candidateName, "Unknown Candidate")}</p>
       </div>
 
-      <div
-        style={{
-          marginTop: "1.5rem",
-          padding: "1.5rem",
-          borderRadius: "10px",
-          textAlign: "center",
-          background: "#f8fafc",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: "#6b7280",
-            fontSize: "0.95rem",
-          }}
-        >
-          Placement Score
+      <div className="report-hero__focal">
+        <p className="report-hero__focal-label">
+          <span aria-hidden="true">🎯</span> Recommended Career Path
         </p>
-
-        <div
-          style={{
-            fontSize: "3rem",
-            fontWeight: "700",
-            lineHeight: 1.1,
-            marginTop: "0.5rem",
-          }}
-        >
-          {placementScore}
-        </div>
-
-        <p
-          style={{
-            marginTop: "0.5rem",
-            color: "#6b7280",
-          }}
-        >
-          out of 100
+        <h2 className="report-hero__focal-role">{recommendedRole}</h2>
+        {hasMatch && bestMatchPct != null && Number.isFinite(Number(bestMatchPct)) && (
+          <p className="report-hero__focal-alignment">
+            {formatAlignment(bestMatchPct)} Alignment
+          </p>
+        )}
+        <p className="report-hero__target">
+          Target Role: <span>{asText(targetRole, "Not Specified")}</span>
         </p>
       </div>
-    </div>
+
+      <div className="kpi-row">
+        <div className={`kpi-card kpi-card--placement kpi-card--${placementTier}`}>
+          <p className="kpi-card__label">Placement Score</p>
+          <p className="kpi-card__value kpi-card__value--xl">{placement}</p>
+          <p className="kpi-card__unit">out of 100</p>
+        </div>
+
+        <div className="kpi-card kpi-card--coverage">
+          <p className="kpi-card__label">Coverage Score</p>
+          <p className="kpi-card__value kpi-card__value--lg">{coverage}%</p>
+          <div
+            className="kpi-card__progress"
+            role="progressbar"
+            aria-valuenow={coverage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Skill coverage"
+          >
+            <div
+              className="kpi-card__progress-fill"
+              style={{ width: `${Math.min(100, Math.max(0, coverage))}%` }}
+            />
+          </div>
+          <p className="kpi-card__unit">skill match rate</p>
+        </div>
+
+        <div className="kpi-card kpi-card--match">
+          <p className="kpi-card__label">Best Career Match</p>
+          <p className="kpi-card__value kpi-card__value--role">{recommendedRole}</p>
+          {hasMatch && bestMatchPct != null && Number.isFinite(Number(bestMatchPct)) && (
+            <p className="kpi-card__match-pct">{formatAlignment(bestMatchPct)} alignment</p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

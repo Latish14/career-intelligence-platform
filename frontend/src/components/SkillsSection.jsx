@@ -1,92 +1,104 @@
-// frontend/src/components/SkillsSection.jsx
+import { useMemo, useState } from "react";
+import { skillName } from "../utils/normalize";
 
-function SkillsSection({
-  title,
-  skills = [],
-}) {
-  const hasSkills =
-    Array.isArray(skills) && skills.length > 0;
+function SkillsSection({ title, skills = [], variant = "detected" }) {
+  const [query, setQuery] = useState("");
+  const safeSkills = Array.isArray(skills) ? skills : [];
+  const hasSkills = safeSkills.length > 0;
+  const chipClass =
+    variant === "missing" ? "skill-chip--missing" : "skill-chip--detected";
+  const showSearch = hasSkills && safeSkills.length >= 4;
+
+  const filteredSkills = useMemo(() => {
+    if (!query.trim()) return safeSkills;
+
+    const normalized = query.trim().toLowerCase();
+    return safeSkills.filter((item) =>
+      skillName(item).toLowerCase().includes(normalized)
+    );
+  }, [safeSkills, query]);
 
   return (
-    <div
-      style={{
-        background: "#ffffff",
-        border: "1px solid #e5e7eb",
-        borderRadius: "12px",
-        padding: "1.5rem",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        width: "100%",
-      }}
-    >
-      <h3
-        style={{
-          margin: 0,
-          marginBottom: "1rem",
-        }}
-      >
-        {title}
-      </h3>
+    <div className="card card--elevated card--hover">
+      <div className="card__header">
+        <div className="card__header-text">
+          <h3 className="card__title">{title}</h3>
+          {hasSkills && (
+            <p className="card__subtitle">
+              {variant === "detected"
+                ? "Skills identified from your resume"
+                : "Skills to develop for market alignment"}
+            </p>
+          )}
+        </div>
+        {hasSkills && (
+          <span className="skills-count">{filteredSkills.length}</span>
+        )}
+      </div>
 
       {!hasSkills ? (
-        <p
-          style={{
-            margin: 0,
-            color: "#6b7280",
-          }}
-        >
-          No skills available.
-        </p>
+        <p className="card__empty">No skills available.</p>
       ) : (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.75rem",
-          }}
-        >
-          {skills.map((item, index) => {
-            const confidence =
-              item?.confidence !== undefined &&
-              item?.confidence !== null
-                ? Math.round(item.confidence * 100)
-                : null;
-
-            return (
-              <div
-                key={`${item?.skill}-${index}`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.6rem 0.9rem",
-                  borderRadius: "999px",
-                  border: "1px solid #d1d5db",
-                  background: "#f9fafb",
-                  fontSize: "0.95rem",
-                  fontWeight: "500",
-                }}
+        <>
+          {showSearch && (
+            <div className="skills-search">
+              <svg
+                className="skills-search__icon"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
               >
-                <span>
-                  {item?.skill || "Unknown Skill"}
-                </span>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="search"
+                className="skills-search__input"
+                placeholder={`Search ${title.toLowerCase()}...`}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label={`Filter ${title}`}
+              />
+            </div>
+          )}
 
-                {confidence !== null && (
+          {filteredSkills.length === 0 ? (
+            <p className="card__empty">No skills match your search.</p>
+          ) : (
+            <div className="skills-list" role="list" aria-label={title}>
+              {filteredSkills.map((item, index) => {
+                const name = skillName(item) || "Unknown Skill";
+                const confidence =
+                  item &&
+                  typeof item === "object" &&
+                  item.confidence !== undefined &&
+                  item.confidence !== null
+                    ? Math.round(Number(item.confidence) * 100)
+                    : null;
+
+                return (
                   <span
-                    style={{
-                      fontSize: "0.8rem",
-                      color: "#6b7280",
-                      borderLeft:
-                        "1px solid #d1d5db",
-                      paddingLeft: "0.5rem",
-                    }}
+                    key={`${name}-${index}`}
+                    className={`skill-chip ${chipClass}`}
+                    role="listitem"
                   >
-                    {confidence}%
+                    <span>{name}</span>
+
+                    {confidence !== null && !Number.isNaN(confidence) && (
+                      <span className="skill-chip__confidence">
+                        {confidence}%
+                      </span>
+                    )}
                   </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
