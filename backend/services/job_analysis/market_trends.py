@@ -56,7 +56,7 @@ import logging
 from collections import defaultdict
 from typing import Literal, TypedDict
 
-from job_analysis.skill_counter import CorpusStats, SkillStat
+from services.job_analysis.skill_counter import CorpusStats, SkillStat
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -501,6 +501,64 @@ def learning_roadmap(
         len(roadmap), len(user_skills),
     )
     return roadmap
+
+
+def role_alignment_for_user(
+    user_skills: list[str]
+) -> list[RoleAlignment]:
+
+    user_set = {s.lower() for s in user_skills}
+
+    alignments = []
+
+    for role, profile in _ROLE_PROFILES.items():
+
+        must_skills = profile["must_skills"]
+        bonus_skills = profile["bonus_skills"]
+
+        matched_must = [
+            s for s in must_skills
+            if s.lower() in user_set
+        ]
+
+        missing_must = [
+            s for s in must_skills
+            if s.lower() not in user_set
+        ]
+
+        matched_bonus = [
+            s for s in bonus_skills
+            if s.lower() in user_set
+        ]
+
+        must_score = (
+            len(matched_must) / len(must_skills)
+        ) * 80
+
+        bonus_score = (
+            len(matched_bonus) / len(bonus_skills)
+        ) * 20
+
+        alignment_pct = round(
+            must_score + bonus_score,
+            1
+        )
+
+        alignments.append(
+            RoleAlignment(
+                role=role,
+                alignment_pct=alignment_pct,
+                matched_must=matched_must,
+                missing_must=missing_must,
+                matched_bonus=matched_bonus,
+            )
+        )
+
+    alignments.sort(
+        key=lambda x: -x["alignment_pct"]
+    )
+
+    return alignments
 
 
 # ── Trend snapshot (human-readable summary) ───────────────────────────────────

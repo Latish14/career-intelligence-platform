@@ -58,8 +58,8 @@ from collections import defaultdict
 from itertools import combinations
 from typing import TypedDict
 
-from job_analysis.jd_parser import ParsedJD
-from skill_engine.skill_dictionary import ALIAS_INDEX, get_entry
+from services.job_analysis.jd_parser import ParsedJD
+from services.skill_engine.skill_dictionary import ALIAS_INDEX, get_entry
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

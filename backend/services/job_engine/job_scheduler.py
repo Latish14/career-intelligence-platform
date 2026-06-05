@@ -397,8 +397,8 @@ def _build_cli() -> argparse.ArgumentParser:
     p.add_argument("--location",     default="",
                    help="Location hint (not used by RemoteOK)")
     p.add_argument("--sources",      nargs="+",
-                   default=["remoteok"],
-                   choices=["remoteok"],
+                   default=["adzuna", "jsearch", "remoteok"],
+                   choices=["adzuna", "jsearch", "remoteok"],
                    help="Sources to scrape")
     p.add_argument("--max-per-source", type=int, default=50,
                    dest="max_per_source")

@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import logging
 import os
+import json
+
 import tempfile
 from pathlib import Path
 from typing import Annotated
@@ -42,6 +44,8 @@ from repositories.report_repository import ReportRepository
 
 from services.career_report.report_generator import generate_career_report
 from tinydb import TinyDB
+from tinydb.storages import JSONStorage
+
 
 from services.skill_engine.skill_extractor import (
     extract_skills,
@@ -144,67 +148,85 @@ def get_report_config() -> ReportConfig:
 
 def get_job_records() -> list[dict]:
     """
-    Load jobs from jobs.json and convert them into
-    the format expected by report_generator.
+    Load jobs from:
+    - jobs.json (live scraped)
+    - jobs_seed.json (market dataset)
+
+    Convert them into the format expected by report_generator.
     """
-
-    jobs_path = (
-        Path(__file__).resolve().parents[3]
-        / "job_engine"
-        / "jobs.json"
-    )
-
-    print("JOBS PATH:", jobs_path)
-
-    db = TinyDB(str(jobs_path))
-
-    # Read from the TinyDB table named "jobs"
-    jobs_table = db.table("jobs")
-
-    all_jobs = jobs_table.all()
-
-    print("TOTAL JOBS IN JSON:", len(all_jobs))
 
     job_records = []
 
-    for job in all_jobs:
+    BASE_DIR = Path(__file__).resolve().parents[3]
 
-        description = job.get(
-            "description",
-            "",
-        )
+    files = [
+        BASE_DIR / "job_engine" / "jobs.json",
+        BASE_DIR / "job_engine" / "jobs_seed.json",
+    ]
 
-        result = extract_skills(
-            description,
-        )
+    for file_path in files:
 
-        skills = [
-            skill["skill"]
-            for skill in result["skills"]
-        ]
+        if not file_path.exists():
+            print(f"Missing: {file_path}")
+            continue
 
-        if skills:
-            job_records.append(
-                {
-                    "job_id": job.get(
-                        "job_id",
-                        "",
-                    ),
-                    "skills": skills,
-                }
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8",
+        ) as f:
+            data = json.load(f)
+
+        jobs = data.get("jobs", {})
+
+        for job in jobs.values():
+
+            description = job.get(
+                "description",
+                "",
             )
+
+            result = extract_skills(
+                description
+            )
+
+            skills = [
+                skill["skill"]
+                for skill in result["skills"]
+            ]
+
+            if skills:
+
+                job_records.append(
+                    {
+                        "job_id": job.get(
+                            "job_id",
+                            "",
+                        ),
+                        "title": job.get("title", ""),
+                        "description": description,
+                        "skills": skills,
+                    }
+                )
 
     print(
         "TOTAL JOB RECORDS:",
-        len(job_records),
+        len(job_records)
     )
 
     if job_records:
         print(
             "FIRST RECORD:",
-            job_records[0],
+            job_records[0]
         )
 
+    print("TOTAL JOB RECORDS:", len(job_records))
+
+    if job_records:
+        print("FIRST RECORD:", job_records[0])
+    else:
+        print("NO JOB RECORDS CREATED")
+    
     return job_records
 
 

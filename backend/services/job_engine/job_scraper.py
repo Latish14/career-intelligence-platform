@@ -66,6 +66,11 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, TypedDict
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(env_path)
 
 import requests
 from requests import Response, Session
@@ -259,7 +264,7 @@ def scrape_adzuna(
     query: str,
     location: str = "",
     max_results: int = _DEFAULT_MAX_JOBS,
-    country: str = "gb",
+    country: str = "in",
 ) -> ScrapeResult:
     """
     Scrape jobs from Adzuna API with automatic pagination.
@@ -308,8 +313,10 @@ def scrape_adzuna(
         url = f"{_ADZUNA_BASE}/{country}/search/{page}"
 
         try:
-            resp = _get_with_retry(session, url, params=params, source="adzuna")
+            resp = _get_with_retry(session, url, params=params, source="adzuna")   
+           
             data = resp.json()
+           
         except Exception as exc:
             logger.error("[adzuna] Page %d failed: %s", page, exc)
             break

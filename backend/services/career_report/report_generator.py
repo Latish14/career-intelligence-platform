@@ -55,9 +55,17 @@ from services.gap_analysis.job_skills             import aggregate_job_skills, J
 from services.gap_analysis.gap_detector           import detect_gaps
 from services.gap_analysis.priority_ranking        import rank_gaps
 from services.roadmap.roadmap_builder    import build_roadmap
+from services.job_analysis.jd_parser import parse_jd
+from services.job_analysis.skill_counter import count_corpus
+from services.job_analysis.market_trends import (
+    generate_trends,
+    role_alignment_for_user,
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
+
+
 
 
 # ── Output type ───────────────────────────────────────────────────────────────
@@ -70,6 +78,8 @@ class CareerReport(TypedDict):
     missing_skills:  list[dict]
     priority_skills: list[dict]
     roadmap:         list[dict]
+    trending_skills: list[dict]
+    role_alignments: list[dict]
     coverage_pct:    float
     placement_score: float
     success:         bool
@@ -96,6 +106,8 @@ class PipelineContext:
     missing_skills:  list[dict]   = field(default_factory=list)
     priority_skills: list[dict]   = field(default_factory=list)
     roadmap:         list[dict]   = field(default_factory=list)
+    trending_skills: list[dict] = field(default_factory=list)
+    role_alignments: list[dict] = field(default_factory=list)
     coverage_pct:    float        = 0.0
     placement_score: float        = 0.0
 
@@ -192,6 +204,96 @@ class MarketAnalysisStage:
                     len(ctx.market_skills),
                     ctx.market_skills[0]["skill"]      if ctx.market_skills else "none",
                     ctx.market_skills[0]["demand_pct"] if ctx.market_skills else 0.0)
+
+
+class MarketTrendStage:
+    """
+    Generates market intelligence insights from job descriptions.
+
+    Produces:
+    - trending_skills
+    - role_alignments
+    """
+
+    def run(self, ctx: PipelineContext) -> None:
+
+        if not ctx.job_records:
+            logger.warning(
+                "[MarketTrendStage] No job records available."
+            )
+            return
+        print("FIRST JOB:")
+        print(ctx.job_records[0])
+        logger.info(
+            "[MarketTrendStage] Processing %d job records.",
+            len(ctx.job_records)
+        )
+
+        parsed_jds = []
+
+        for job in ctx.job_records:
+
+            try:
+                parsed = parse_jd(
+                    job.get("description", "")
+                )
+
+                if parsed.get("success"):
+                    parsed_jds.append(
+                        parsed.get("parsed")
+                    )
+
+            except Exception as exc:
+                logger.warning(
+                    "[MarketTrendStage] JD parse failed: %s",
+                    exc
+                )
+
+        logger.info(
+            "[MarketTrendStage] Parsed %d job descriptions.",
+            len(parsed_jds)
+        )
+
+        if not parsed_jds:
+            logger.warning(
+                "[MarketTrendStage] No parsed JDs generated."
+            )
+            return
+
+        corpus = count_corpus(
+            parsed_jds,
+            min_count=1,
+        )
+
+        trends = generate_trends(
+            corpus
+        )
+
+        ctx.trending_skills = [
+            dict(item)
+            for item in trends.get("top_skills", [])[:10]
+        ]
+
+        user_skill_names = [
+            skill["skill"]
+            for skill in ctx.detected_skills
+        ]
+
+        ctx.role_alignments = role_alignment_for_user(
+            user_skill_names
+        )[:5]
+
+        logger.info(
+            "[MarketTrendStage] Generated %d trending skills and %d role alignments.",
+            len(ctx.trending_skills),
+            len(ctx.role_alignments),
+        )
+
+        print("\n=== MARKET TREND STAGE ===")
+        print("TRENDING:", ctx.trending_skills)
+        print("ROLES:", ctx.role_alignments)
+        print("==========================\n")
+
 
 
 class GapAnalysisStage:
@@ -297,6 +399,7 @@ class ReportGenerator:
             parsing_stage    or ResumeParsingStage(),
             extraction_stage or SkillExtractionStage(),
             market_stage     or MarketAnalysisStage(),
+            MarketTrendStage(),
             gap_stage        or GapAnalysisStage(),
             roadmap_stage    or RoadmapGenerationStage(),
         ]
@@ -390,6 +493,8 @@ class ReportGenerator:
             roadmap         = ctx.roadmap,
             coverage_pct    = ctx.coverage_pct,
             placement_score = ctx.placement_score,
+            trending_skills=ctx.trending_skills,
+            role_alignments=ctx.role_alignments,
             success         = error is None,
             error           = error,
         )
