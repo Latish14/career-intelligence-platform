@@ -3,6 +3,8 @@
 import ReportSummary from "./ReportSummary";
 import SkillsSection from "./SkillsSection";
 import RoadmapSection from "./RoadmapSection";
+import TrendingSkillsSection from "./TrendingSkillsSection";
+import RoleAlignmentSection from "./RoleAlignmentSection";
 
 function ReportDashboard({ report }) {
   if (!report) {
@@ -66,6 +68,19 @@ function ReportDashboard({ report }) {
           report.roadmap || []
         }
       />
+
+      <TrendingSkillsSection
+        skills={
+          report.trending_skills || []
+        }
+      />
+
+      <RoleAlignmentSection
+        roles={
+          report.role_alignments || []
+        }
+      />
+      
     </div>
   );
 }

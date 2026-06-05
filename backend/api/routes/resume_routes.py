@@ -98,6 +98,23 @@ class RoadmapEntry(BaseModel):
     priority:       str
     reason:         str
     duration_weeks: int
+    
+    
+class TrendingSkillItem(BaseModel):
+    skill: str
+    category: str | None = None
+    demand_pct: float | None = None
+    count: int | None = None
+    tier: str | None = None
+    demand_score: float | None = None
+
+
+class RoleAlignmentItem(BaseModel):
+    role: str
+    alignment_pct: float
+    matched_must: list[str] = []
+    missing_must: list[str] = []
+    matched_bonus: list[str] = []
 
 
 class CareerReportResponse(BaseModel):
@@ -108,6 +125,8 @@ class CareerReportResponse(BaseModel):
     missing_skills:  list[MissingSkillItem] = Field(description="Skills not in resume but in market")
     priority_skills: list[PrioritySkillItem]= Field(description="Ranked learning priorities")
     roadmap:         list[RoadmapEntry]     = Field(description="Week-by-week learning plan")
+    trending_skills: list[TrendingSkillItem] = []
+    role_alignments: list[RoleAlignmentItem] = []
     coverage_pct:    float                  = Field(description="Percentage of market skills the user has")
     placement_score: float                  = Field(description="Weighted placement readiness 0–100")
 
@@ -328,6 +347,11 @@ def _build_response(raw: dict) -> CareerReportResponse:
     Convert a raw CareerReport dict into the Pydantic response model.
     Fields missing from raw dicts are defaulted to empty lists / zero.
     """
+    print("\nRAW TRENDING:")
+    print(raw.get("trending_skills", [])[:2])
+
+    print("\nRAW ALIGNMENTS:")
+    print(raw.get("role_alignments", [])[:2])
     return CareerReportResponse(
         candidate_name  = raw.get("candidate_name", ""),
         target_role     = raw.get("target_role",    ""),
@@ -340,6 +364,15 @@ def _build_response(raw: dict) -> CareerReportResponse:
                            for s in raw.get("priority_skills", [])],
         roadmap         = [RoadmapEntry(**_coerce_roadmap(e))
                            for e in raw.get("roadmap", [])],
+        trending_skills = [
+            TrendingSkillItem(**s)
+            for s in raw.get("trending_skills", [])
+        ],
+
+        role_alignments = [
+            RoleAlignmentItem(**s)
+            for s in raw.get("role_alignments", [])
+        ],
         coverage_pct    = float(raw.get("coverage_pct",    0.0)),
         placement_score = float(raw.get("placement_score", 0.0)),
     )
