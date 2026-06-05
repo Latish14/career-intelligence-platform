@@ -45,6 +45,7 @@ Output schema
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypedDict
@@ -55,11 +56,9 @@ from services.gap_analysis.job_skills             import aggregate_job_skills, J
 from services.gap_analysis.gap_detector           import detect_gaps
 from services.gap_analysis.priority_ranking        import rank_gaps
 from services.roadmap.roadmap_builder    import build_roadmap
-from services.job_analysis.jd_parser import parse_jd
-from services.job_analysis.skill_counter import count_corpus
+
 from services.job_analysis.market_trends import (
-    generate_trends,
-    role_alignment_for_user,
+    role_alignment_for_user
 )
 
 logger = logging.getLogger(__name__)
@@ -222,57 +221,16 @@ class MarketTrendStage:
                 "[MarketTrendStage] No job records available."
             )
             return
-        print("FIRST JOB:")
-        print(ctx.job_records[0])
         logger.info(
             "[MarketTrendStage] Processing %d job records.",
             len(ctx.job_records)
         )
 
-        parsed_jds = []
-
-        for job in ctx.job_records:
-
-            try:
-                parsed = parse_jd(
-                    job.get("description", "")
-                )
-
-                if parsed.get("success"):
-                    parsed_jds.append(
-                        parsed.get("parsed")
-                    )
-
-            except Exception as exc:
-                logger.warning(
-                    "[MarketTrendStage] JD parse failed: %s",
-                    exc
-                )
-
-        logger.info(
-            "[MarketTrendStage] Parsed %d job descriptions.",
-            len(parsed_jds)
-        )
-
-        if not parsed_jds:
-            logger.warning(
-                "[MarketTrendStage] No parsed JDs generated."
-            )
-            return
-
-        corpus = count_corpus(
-            parsed_jds,
-            min_count=1,
-        )
-
-        trends = generate_trends(
-            corpus
-        )
-
-        ctx.trending_skills = [
-            dict(item)
-            for item in trends.get("top_skills", [])[:10]
-        ]
+        ctx.trending_skills = sorted(
+            ctx.market_skills,
+            key=lambda x: x.get("demand_pct", 0),
+            reverse=True,
+        )[:10]
 
         user_skill_names = [
             skill["skill"]
@@ -288,11 +246,6 @@ class MarketTrendStage:
             len(ctx.trending_skills),
             len(ctx.role_alignments),
         )
-
-        print("\n=== MARKET TREND STAGE ===")
-        print("TRENDING:", ctx.trending_skills)
-        print("ROLES:", ctx.role_alignments)
-        print("==========================\n")
 
 
 
@@ -464,7 +417,13 @@ class ReportGenerator:
 
         for stage in self._stages:
             try:
+                start = time.perf_counter()
                 stage.run(ctx)
+                logger.info(
+                    "%s took %.2f sec",
+                    type(stage).__name__,
+                    time.perf_counter() - start,
+                )
             except (FileNotFoundError, ValueError) as exc:
                 logger.error("%s failed: %s", type(stage).__name__, exc)
                 return self._build_report(ctx, error=str(exc))

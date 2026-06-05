@@ -394,6 +394,14 @@ class RoadmapBuilder:
                 estimated_duration_weeks = 0,
                 roadmap                  = [],
             )
+        
+        
+        skill_inputs.sort(
+            key=lambda x: x.demand_pct,
+            reverse=True,
+        )
+
+        skill_inputs = skill_inputs[:15]
 
         # ── Schedule ──────────────────────────────────────────────────────
         scheduler = SkillScheduler(user_skills)
