@@ -20,10 +20,10 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from backend.models import user, resume, skill, job
+from models import user, resume, skill, job
 
-from backend.database.base import Base
-from backend.database.connection import engine
+from database.base import Base
+from database.connection import engine
 
 
 # -----------------------------------------------------------------------------

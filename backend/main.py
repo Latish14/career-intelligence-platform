@@ -4,6 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from database.init_db import initialize_database
+
 from api.routes.analysis_routes import router as analysis_router
 from api.routes.resume_routes import router as resume_router
 from api.routes.report_routes import router as report_router
@@ -73,6 +75,7 @@ async def log_requests(request: Request, call_next):
 # -----------------------------------------------------------------------------
 @app.on_event("startup")
 async def startup_event():
+    initialize_database()
     logger.info("Career Intelligence Platform API started successfully.")
 
 
