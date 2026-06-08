@@ -390,43 +390,6 @@
   padding: var(--space-2xl);
 }
 
-.loading-overlay__ring {
-  position: relative;
-  width: 72px;
-  height: 72px;
-  margin: 0 auto var(--space-xl);
-}
-
-.loading-overlay__ring-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.loading-overlay__ring-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 3;
-}
-
-.loading-overlay__ring-progress {
-  fill: none;
-  stroke: url(#loaderGradient);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-dasharray: 220;
-  stroke-dashoffset: 220;
-  animation: ringProgress 2s ease-in-out infinite;
-}
-
-.loading-overlay__ring-spinner {
-  display: none;
-}
-
-.loading-overlay__ring-pulse {
-  display: none;
-}
-
 .loading-overlay__title {
   font-family: var(--font-heading);
   font-size: var(--font-size-xl);
@@ -443,6 +406,120 @@
   margin: 0 auto;
   line-height: 1.55;
 }
+
+/* Morph Loader */
+
+.morph-loader {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto var(--space-xl);
+}
+
+.morph-square {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(
+    135deg,
+    #818cf8,
+    #6366f1
+  );
+  border-radius: 4px;
+}
+
+.morph-square-0 {
+  animation: morph0 2s infinite ease-in-out;
+}
+
+.morph-square-1 {
+  animation: morph1 2s infinite ease-in-out;
+}
+
+.morph-square-2 {
+  animation: morph2 2s infinite ease-in-out;
+}
+
+.morph-square-3 {
+  animation: morph3 2s infinite ease-in-out;
+}
+
+@keyframes morph0 {
+  0%,100% {
+    transform: translate(0,0) scale(1);
+    border-radius: 0%;
+  }
+  25% {
+    transform: translate(20px,-20px) scale(1.2);
+    border-radius: 50%;
+  }
+  50% {
+    transform: translate(40px,0) scale(0.8);
+    border-radius: 25%;
+  }
+  75% {
+    transform: translate(20px,20px) scale(1.1);
+    border-radius: 75%;
+  }
+}
+
+@keyframes morph1 {
+  0%,100% {
+    transform: translate(0,0) scale(1) rotate(0deg);
+    border-radius: 0%;
+  }
+  25% {
+    transform: translate(-20px,-20px) scale(1.3) rotate(90deg);
+    border-radius: 50%;
+  }
+  50% {
+    transform: translate(-40px,0) scale(0.7) rotate(180deg);
+    border-radius: 25%;
+  }
+  75% {
+    transform: translate(-20px,20px) scale(1.2) rotate(270deg);
+    border-radius: 75%;
+  }
+}
+
+@keyframes morph2 {
+  0%,100% {
+    transform: translate(0,0) scale(1);
+    border-radius: 0%;
+  }
+  25% {
+    transform: translate(-20px,20px) scale(0.9);
+    border-radius: 100%;
+  }
+  50% {
+    transform: translate(0,40px) scale(1.4);
+    border-radius: 0%;
+  }
+  75% {
+    transform: translate(20px,20px) scale(0.8);
+    border-radius: 50%;
+  }
+}
+
+@keyframes morph3 {
+  0%,100% {
+    transform: translate(0,0) scale(1) rotate(0deg);
+    border-radius: 0%;
+  }
+  25% {
+    transform: translate(20px,20px) scale(1.1) rotate(-90deg);
+    border-radius: 25%;
+  }
+  50% {
+    transform: translate(0,-40px) scale(1.3) rotate(-180deg);
+    border-radius: 100%;
+  }
+  75% {
+    transform: translate(-20px,-20px) scale(0.9) rotate(-270deg);
+    border-radius: 75%;
+  }
+}
+
 
 /* ── Dashboard layout ──────────────────────────────────────────────────────── */
 
@@ -514,8 +591,8 @@
 }
 
 .hero-grid__left {
-  background: #161b27;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-2xl);
   position: relative;
@@ -557,7 +634,7 @@
 
 .hero-grid__role {
   font-family: var(--font-heading);
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   font-weight: 800;
   color: var(--color-text-heading);
   letter-spacing: -0.03em;
@@ -574,9 +651,9 @@
 
 .hero-grid__alignment-val {
   font-family: var(--font-metric);
-  font-size: var(--font-size-xl);
-  font-weight: 700;
-  color: var(--color-primary);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--color-text-heading);
   letter-spacing: -0.02em;
 }
 
@@ -597,7 +674,7 @@
 
 .hero-grid__progress-fill {
   height: 100%;
-  background: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
   border-radius: var(--radius-full);
   animation: progressFill 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
@@ -607,13 +684,15 @@
   align-items: center;
   gap: var(--space-sm);
   padding-top: var(--space-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--color-border);
 }
 
 .hero-grid__target-lbl {
   font-family: var(--font-body);
-  font-size: var(--font-size-sm);
+  font-size: 0.75rem;
   color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .hero-grid__target-val {
@@ -630,8 +709,8 @@
 }
 
 .hero-metric-card {
-  background: #1e2535;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-lg) var(--space-xl);
   display: flex;
@@ -664,7 +743,7 @@
 
 .hero-metric-card__value {
   font-family: var(--font-metric);
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -673,7 +752,7 @@
 
 .hero-metric-card__value--role {
   font-family: var(--font-heading);
-  font-size: var(--font-size-lg);
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -681,6 +760,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--color-text-heading);
 }
 
 .hero-metric-card__sub {
@@ -694,7 +774,7 @@
 .hero-metric-card__bar {
   width: 100%;
   height: 4px;
-  background: var(--color-bg);
+  background: var(--color-bg-section);
   border-radius: var(--radius-full);
   margin-top: var(--space-sm);
   overflow: hidden;
@@ -734,7 +814,7 @@
 
 .circular-progress__track {
   fill: none;
-  stroke: var(--color-bg);
+  stroke: var(--color-bg-section);
   stroke-width: 6;
 }
 
@@ -1498,7 +1578,7 @@
 
 .download-btn {
   background: var(--color-surface-raised);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   color: var(--color-text);
   font-family: var(--font-heading);
@@ -1508,14 +1588,15 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   display: inline-flex;
   flex-direction: column;
 }
 
 .download-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
 }
 
 .download-btn__content {
