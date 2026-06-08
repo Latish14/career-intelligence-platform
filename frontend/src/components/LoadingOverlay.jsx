@@ -8,7 +8,6 @@ function LoadingOverlay() {
     >
       <div className="loading-overlay__content">
         <div className="loading-overlay__ring">
-          <div className="loading-overlay__ring-pulse" />
           <svg className="loading-overlay__ring-svg" viewBox="0 0 80 80">
             <defs>
               <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -20,7 +19,6 @@ function LoadingOverlay() {
             <circle className="loading-overlay__ring-track" cx="40" cy="40" r="35" />
             <circle className="loading-overlay__ring-progress" cx="40" cy="40" r="35" />
           </svg>
-          <div className="loading-overlay__ring-spinner" />
         </div>
 
         <h2 className="loading-overlay__title">

@@ -1,0 +1,73 @@
+/* ── Download Report Button ──────────────────────────────────────────────── */
+
+.download-report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.25rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease,
+    transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.download-report-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.download-report-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.download-report-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.download-report-btn__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Spinner shown during PDF generation */
+.download-report-btn__spinner {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: btn-spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Action bars ─────────────────────────────────────────────────────────── */
+
+.dashboard__action-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0;
+}
+
+/* Optional: sticky bar pinned to the bottom of the viewport */
+.dashboard__action-bar--bottom {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-primary, #ffffff);
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  padding: 0.75rem 1rem;
+  margin: 0 -1rem;          /* bleed to card edges if inside a padded container */
+  z-index: 10;
+}

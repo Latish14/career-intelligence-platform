@@ -1,8 +1,5 @@
 import { asText, asNumber } from "../utils/normalize";
 
-const RANK_LABELS = ["Best Match", "Second Match", "Third Match"];
-const RANK_MEDALS = ["🥇", "🥈", "🥉"];
-
 function getAlignmentStyle(pct, isBest) {
   if (isBest) {
     return {
@@ -32,7 +29,7 @@ function RoleAlignmentSection({ roles = [] }) {
   const safeRoles = Array.isArray(roles) ? roles : [];
 
   return (
-    <div className="card card--elevated card--hover">
+    <div className="card card--elevated">
       <div className="card__header">
         <div className="card__header-text">
           <h3 className="card__title">Career Role Alignment</h3>
@@ -53,29 +50,23 @@ function RoleAlignmentSection({ roles = [] }) {
             const roleName = asText(role.role, "Unknown Role");
             const isBest = index === 0;
             const { fillClass, pctClass } = getAlignmentStyle(pct, isBest);
-            const isTopThree = index < 3;
             const displayPct = Number.isInteger(pct) ? pct : pct.toFixed(1);
 
             return (
               <div
                 key={`${roleName}-${index}`}
-                className={`role-card${isBest ? " role-card--best" : ""}${isTopThree && !isBest ? " role-card--ranked" : ""}`}
+                className={`role-card${isBest ? " role-card--best" : ""}`}
                 role="listitem"
               >
                 {isBest && <div className="role-card__accent-bar" aria-hidden="true" />}
 
                 <div className="role-card__header">
                   <div className="role-card__title-group">
-                    {isTopThree && (
-                      <span className="role-card__medal" aria-hidden="true">
-                        {RANK_MEDALS[index]}
-                      </span>
-                    )}
+                    <span className="role-card__medal" aria-hidden="true">
+                      {index + 1}
+                    </span>
                     <div>
                       <p className="role-card__name">{roleName}</p>
-                      {isTopThree && (
-                        <p className="role-card__rank-label">{RANK_LABELS[index]}</p>
-                      )}
                     </div>
                   </div>
 

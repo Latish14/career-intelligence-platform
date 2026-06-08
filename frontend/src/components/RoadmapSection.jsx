@@ -25,7 +25,7 @@ function RoadmapSection({ roadmap = [] }) {
   };
 
   return (
-    <div className="card card--elevated card--hover">
+    <div className="card card--elevated">
       <div className="card__header">
         <div className="card__header-text">
           <h3 className="card__title">Learning Roadmap</h3>
@@ -103,14 +103,8 @@ function RoadmapSection({ roadmap = [] }) {
                           <div className="accordion__skill-meta">
                             <span
                               className={`badge ${getPriorityBadgeClass(item.priority)}`}
-                            >
-                              {asText(item.priority, "Medium")}
-                            </span>
-                            {item.category && (
-                              <span className="badge badge--category">
-                                {asText(item.category).replace(/_/g, " ")}
-                              </span>
-                            )}
+                              title={asText(item.priority, "Medium")}
+                            />
                             <span className="accordion__skill-duration">
                               {Number(item.duration_weeks) || 1} wk
                               {(Number(item.duration_weeks) || 1) > 1 ? "s" : ""}
