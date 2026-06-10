@@ -5,21 +5,23 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.55rem 1.25rem;
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: #F4F0F8;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 600;
+  font-family: var(--font-heading);
   cursor: pointer;
-  transition: background-color 0.15s ease, opacity 0.15s ease,
-    transform 0.1s ease;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast),
+    transform var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
 .download-report-btn:hover:not(:disabled) {
-  background-color: #1d4ed8;
-  transform: translateY(-1px);
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(193, 53, 132, 0.35);
 }
 
 .download-report-btn:active:not(:disabled) {
@@ -42,8 +44,8 @@
   display: inline-block;
   width: 0.85rem;
   height: 0.85rem;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #ffffff;
+  border: 2px solid rgba(244, 240, 248, 0.4);
+  border-top-color: #F4F0F8;
   border-radius: 50%;
   animation: btn-spin 0.65s linear infinite;
   flex-shrink: 0;
@@ -65,8 +67,8 @@
 .dashboard__action-bar--bottom {
   position: sticky;
   bottom: 0;
-  background: var(--bg-primary, #ffffff);
-  border-top: 1px solid var(--border-color, #e5e7eb);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
   padding: 0.75rem 1rem;
   margin: 0 -1rem;          /* bleed to card edges if inside a padded container */
   z-index: 10;
