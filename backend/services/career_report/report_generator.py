@@ -237,6 +237,15 @@ class MarketTrendStage:
             for skill in ctx.detected_skills
         ]
 
+        print("\nUSER SKILLS SENT TO ROLE ENGINE:")
+        print(user_skill_names)
+
+        result = role_alignment_for_user(user_skill_names)
+
+        print("\nROLE ALIGNMENTS:")
+        for role in result:
+            print(role)
+
         ctx.role_alignments = role_alignment_for_user(
             user_skill_names
         )[:5]

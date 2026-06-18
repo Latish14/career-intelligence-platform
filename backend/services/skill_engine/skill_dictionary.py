@@ -66,11 +66,19 @@ CATEGORIES: frozenset[str] = frozenset({
     "database",
     "cloud",
     "devops",
+
     "data_science",
     "machine_learning",
     "nlp",
     "computer_vision",
     "data_engineering",
+
+    "security",
+    "networking",
+
+    "finance",
+    "business",
+
     "mobile",
     "testing",
     "soft_skill",
@@ -837,6 +845,199 @@ SKILL_CATALOG: list[SkillEntry] = [
                     "experimentation"],
         "category": "data_science",
         "weight": 0.90,
+    },
+    # ── Cyber Security ──────────────────────────────────────────────
+
+    {
+        "canonical": "SIEM",
+        "aliases": ["siem", "security information and event management"],
+        "category": "security",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Splunk",
+        "aliases": ["splunk", "splunk enterprise"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Wazuh",
+        "aliases": ["wazuh"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Suricata",
+        "aliases": ["suricata"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Zeek",
+        "aliases": ["zeek", "bro ids"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Penetration Testing",
+        "aliases": ["penetration testing", "pentesting", "pen test"],
+        "category": "security",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Threat Hunting",
+        "aliases": ["threat hunting", "threat hunter"],
+        "category": "security",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Incident Response",
+        "aliases": ["incident response", "security incident response"],
+        "category": "security",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "OWASP",
+        "aliases": ["owasp", "owasp top 10"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Network Security",
+        "aliases": ["network security", "firewall security"],
+        "category": "security",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "pfSense",
+        "aliases": ["pfsense"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Kali Linux",
+        "aliases": ["kali", "kali linux"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Wireshark",
+        "aliases": ["wireshark"],
+        "category": "security",
+        "weight": 1.0,
+    },
+    
+    # ── Finance ──────────────────────────────────────────────
+
+    {
+        "canonical": "Financial Modeling",
+        "aliases": ["financial modeling", "financial models"],
+        "category": "finance",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Valuation",
+        "aliases": ["valuation", "company valuation"],
+        "category": "finance",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Risk Analysis",
+        "aliases": ["risk analysis", "risk management"],
+        "category": "finance",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Corporate Finance",
+        "aliases": ["corporate finance"],
+        "category": "finance",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Financial Analysis",
+        "aliases": ["financial analysis"],
+        "category": "finance",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Investment Analysis",
+        "aliases": ["investment analysis", "equity research"],
+        "category": "finance",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Bloomberg",
+        "aliases": ["bloomberg terminal", "bloomberg"],
+        "category": "finance",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Forecasting",
+        "aliases": ["forecasting", "financial forecasting"],
+        "category": "finance",
+        "weight": 0.90,
+    },
+    {
+        "canonical": "Excel",
+        "aliases": ["excel", "microsoft excel"],
+        "category": "finance",
+        "weight": 0.85,
+    },
+
+    {
+        "canonical": "Power BI",
+        "aliases": ["power bi", "powerbi"],
+        "category": "business",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Tableau",
+        "aliases": ["tableau"],
+        "category": "business",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "Market Research",
+        "aliases": ["market research"],
+        "category": "business",
+        "weight": 0.90,
+    },
+    {
+        "canonical": "Requirements Gathering",
+        "aliases": ["requirements gathering", "business requirements"],
+        "category": "business",
+        "weight": 0.90,
+    },
+    {
+        "canonical": "Stakeholder Management",
+        "aliases": ["stakeholder management"],
+        "category": "business",
+        "weight": 0.90,
+    },
+
+    {
+    "canonical": "RAG",
+    "aliases": ["rag", "retrieval augmented generation"],
+    "category": "nlp",
+    "weight": 1.0,
+    },
+    {
+        "canonical": "Vector Database",
+        "aliases": ["vector database", "pinecone", "weaviate", "qdrant", "chromadb"],
+        "category": "nlp",
+        "weight": 1.0,
+    },
+    {
+        "canonical": "Prompt Engineering",
+        "aliases": ["prompt engineering"],
+        "category": "nlp",
+        "weight": 0.95,
+    },
+    {
+        "canonical": "MLOps",
+        "aliases": ["mlops"],
+        "category": "machine_learning",
+        "weight": 1.0,
     },
 
     # ── Soft Skills ───────────────────────────────────────────────────────────

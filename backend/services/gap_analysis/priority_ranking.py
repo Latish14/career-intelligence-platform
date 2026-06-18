@@ -64,6 +64,7 @@ import logging
 from typing import TypedDict
 
 from services.gap_analysis.gap_detector import GapReport, MissingSkill
+from services.skill_engine.skill_dictionary import SKILL_CATALOG
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

@@ -57,6 +57,9 @@ from collections import defaultdict
 from typing import Literal, TypedDict
 
 from services.job_analysis.skill_counter import CorpusStats, SkillStat
+from services.skill_engine.skill_dictionary import SKILL_CATALOG
+
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -111,14 +114,210 @@ _ROLE_PROFILES: dict[str, dict[str, object]] = {
         "must_skills": ["JavaScript", "React", "SQL"],
         "bonus_skills": ["TypeScript", "Node.js", "Docker", "PostgreSQL"],
     },
+    "AI Engineer": {
+    "must_categories": ["machine_learning", "nlp", "programming_language"],
+    "strong_categories": ["cloud", "data_science"],
+    "must_skills": ["Python", "Transformers", "LLM"],
+    "bonus_skills": ["LangChain", "Vector Database", "RAG", "PyTorch"],
+    },
+
+    "Generative AI Engineer": {
+        "must_categories": ["nlp", "machine_learning"],
+        "strong_categories": ["cloud", "data_science"],
+        "must_skills": ["LLM", "Transformers", "Python"],
+        "bonus_skills": ["LangChain", "RAG", "Vector Database", "Prompt Engineering"],
+    },
+
+    "Data Analyst": {
+        "must_categories": ["database", "data_science"],
+        "strong_categories": ["programming_language"],
+        "must_skills": ["SQL", "Excel", "Data Visualization"],
+        "bonus_skills": ["Power BI", "Tableau", "Python"],
+    },
+
+    "Cloud Engineer": {
+        "must_categories": ["cloud", "devops"],
+        "strong_categories": ["programming_language"],
+        "must_skills": ["AWS", "Docker", "Linux"],
+        "bonus_skills": ["Kubernetes", "Terraform", "CI/CD"],
+    },
+
+    "Cyber Security Analyst": {
+        "must_categories": ["security", "networking"],
+
+        "strong_categories": [
+            "cloud",
+            "programming_language"
+        ],
+
+        "must_skills": [
+            "Linux",
+            "Kali Linux",
+            "Wazuh",
+            "Suricata"
+        ],
+
+        "bonus_skills": [
+            "Zeek",
+            "pfSense",
+            "Wireshark",
+            "Splunk",
+            "Threat Hunting",
+            "Python"
+        ],
+    },
+
+    "Security Engineer": {
+        "must_categories": ["security", "networking"],
+        "strong_categories": ["cloud", "devops"],
+        "must_skills" : [
+            "Linux",
+            "Kali Linux",
+            "Wazuh",
+            "Suricata"
+        ],
+        "bonus_skills": ["Zeek",
+            "pfSense",
+            "Python",
+            "Elasticsearch",
+            "IAM"
+        ],
+    },
+    
+    "SOC Analyst": {
+        "must_categories": [
+            "security",
+            "networking"
+        ],
+
+        "strong_categories": [
+            "cloud"
+        ],
+
+        "must_skills": [
+            "Wazuh",
+            "Suricata",
+            "Zeek"
+        ],
+
+        "bonus_skills": [
+            "Elasticsearch",
+            "Kali Linux",
+            "Linux",
+            "Python"
+        ],
+    },
+    
+    "Threat Detection Engineer": {
+        "must_categories": [
+            "security",
+            "networking"
+        ],
+
+        "strong_categories": [
+            "programming_language"
+        ],
+
+        "must_skills": [
+            "Wazuh",
+            "Suricata",
+            "Zeek"
+        ],
+
+        "bonus_skills": [
+            "Python",
+            "Elasticsearch",
+            "Linux",
+            "pfSense"
+        ],
+    },
+
+    "Mobile Developer": {
+        "must_categories": ["mobile", "programming_language"],
+        "strong_categories": ["database"],
+        "must_skills": ["Android", "Java"],
+        "bonus_skills": ["Kotlin", "Flutter", "Firebase"],
+    },
+
+    "Software Engineer": {
+        "must_categories": ["programming_language"],
+        "strong_categories": ["database", "web_backend"],
+        "must_skills": ["Python", "Git", "SQL"],
+        "bonus_skills": ["Docker", "REST API", "PostgreSQL"],
+    },
+    "Financial Analyst": {
+    "must_categories": ["finance", "data_science"],
+    "strong_categories": ["database", "programming_language"],
+    "must_skills": ["Excel", "Financial Modeling", "Data Analysis"],
+    "bonus_skills": ["Power BI", "SQL", "Python"],
+    },
+
+    "Investment Analyst": {
+        "must_categories": ["finance"],
+        "strong_categories": ["data_science"],
+        "must_skills": ["Financial Modeling", "Valuation", "Excel"],
+        "bonus_skills": ["Bloomberg", "Python", "Power BI"],
+    },
+
+    "Risk Analyst": {
+        "must_categories": ["finance", "data_science"],
+        "strong_categories": ["programming_language"],
+        "must_skills": ["Risk Analysis", "Statistics", "Excel"],
+        "bonus_skills": ["Python", "SQL", "Machine Learning"],
+    },
+
+    "FinTech Analyst": {
+        "must_categories": ["finance", "technology"],
+        "strong_categories": ["data_science"],
+        "must_skills": ["SQL", "Financial Analysis", "Data Analysis"],
+        "bonus_skills": ["Python", "Power BI", "Cloud Computing"],
+    },
+
+    "Quantitative Analyst": {
+        "must_categories": ["finance", "machine_learning", "data_science"],
+        "strong_categories": ["programming_language"],
+        "must_skills": ["Python", "Statistics", "Mathematics"],
+        "bonus_skills": ["Machine Learning", "SQL", "Pandas"],
+    },
+
+    "Business Analyst": {
+        "must_categories": ["data_science", "business"],
+        "strong_categories": ["database"],
+        "must_skills": ["Excel", "Data Analysis", "Requirements Gathering"],
+        "bonus_skills": ["Power BI", "SQL", "Tableau"],
+    },
+
+    "Product Analyst": {
+        "must_categories": ["data_science", "business"],
+        "strong_categories": ["programming_language"],
+        "must_skills": ["SQL", "Analytics", "Data Visualization"],
+        "bonus_skills": ["Python", "A/B Testing", "Power BI"],
+    },
 }
 
 # Category display order for the trend report
 _CATEGORY_ORDER = [
-    "programming_language", "machine_learning", "data_science",
-    "data_engineering", "database", "web_backend", "web_frontend",
-    "cloud", "devops", "nlp", "computer_vision", "mobile",
-    "testing", "soft_skill", "other",
+    "programming_language",
+    "machine_learning",
+    "data_science",
+    "data_engineering",
+    "database",
+    "web_backend",
+    "web_frontend",
+    "cloud",
+    "devops",
+
+    "security",
+    "networking",
+
+    "finance",
+    "business",
+
+    "nlp",
+    "computer_vision",
+    "mobile",
+    "testing",
+    "soft_skill",
 ]
 
 
@@ -516,6 +715,16 @@ def role_alignment_for_user(
         must_skills = profile["must_skills"]
         bonus_skills = profile["bonus_skills"]
 
+        must_categories = profile.get(
+            "must_categories",
+            []
+        )
+
+        strong_categories = profile.get(
+            "strong_categories",
+            []
+        )
+
         matched_must = [
             s for s in must_skills
             if s.lower() in user_set
@@ -531,16 +740,63 @@ def role_alignment_for_user(
             if s.lower() in user_set
         ]
 
+        # ----------------------------
+        # Must skills (60 points)
+        # ----------------------------
+
         must_score = (
-            len(matched_must) / len(must_skills)
-        ) * 80
+            len(matched_must) /
+            max(len(must_skills), 1)
+        ) * 60
+
+        # ----------------------------
+        # Bonus skills (20 points)
+        # ----------------------------
 
         bonus_score = (
-            len(matched_bonus) / len(bonus_skills)
+            len(matched_bonus) /
+            max(len(bonus_skills), 1)
+        ) * 20
+
+        # ----------------------------
+        # Category coverage (20 points)
+        # ----------------------------
+
+        category_hits = 0
+
+        skill_category_map = {
+            skill["canonical"].lower(): skill["category"]
+            for skill in SKILL_CATALOG
+        }
+
+        user_categories = {
+            skill_category_map[s]
+            for s in user_set
+            if s in skill_category_map
+        }
+
+        for category in must_categories:
+            if category in user_categories:
+                category_hits += 2
+
+        for category in strong_categories:
+            if category in user_categories:
+                category_hits += 1
+
+        max_category_score = (
+            len(must_categories) * 2
+            + len(strong_categories)
+        )
+
+        category_score = (
+            category_hits /
+            max(max_category_score, 1)
         ) * 20
 
         alignment_pct = round(
-            must_score + bonus_score,
+            must_score +
+            bonus_score +
+            category_score,
             1
         )
 
@@ -559,6 +815,7 @@ def role_alignment_for_user(
     )
 
     return alignments
+
 
 
 # ── Trend snapshot (human-readable summary) ───────────────────────────────────
