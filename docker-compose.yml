@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      # Do not override the installed dependencies
+      - /app/venv/
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    # We map port 3000 to port 80 where nginx is listening.
+    # We do not use volume mapping for frontend because it's built and served via nginx.
