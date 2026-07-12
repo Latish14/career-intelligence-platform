@@ -1,0 +1,58 @@
+# =============================================================================
+# .dockerignore — keep build context lean for the root Dockerfile
+# =============================================================================
+
+# --- Version control ---------------------------------------------------------
+.git
+.gitignore
+
+# --- Frontend (not needed in backend-only image) ----------------------------
+frontend/node_modules
+frontend/dist
+frontend/.env
+
+# --- Python caches & virtual environments ------------------------------------
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+backend/venv/
+backend/.venv/
+backend/env/
+backend/__pycache__/
+
+# --- Environment / secrets ---------------------------------------------------
+# On deployment platforms (Railway, Render), set env vars in their UI.
+# For local Docker builds, the .env file is copied into the image so
+# load_dotenv() works out of the box. If you prefer NOT to bake secrets
+# into the image, uncomment the lines below and use:
+#   docker run --env-file backend/.env ...
+# .env
+# backend/.env
+
+# --- IDE & OS ----------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
+
+# --- Docker ------------------------------------------------------------------
+docker-compose.yml
+docker/
+
+# --- Docs & non-essential files ----------------------------------------------
+docs/
+data/
+*.md
+*.pdf
+.ipynb_checkpoints/
+*.log
+
+# --- Test files (not needed in production image) -----------------------------
+backend/test_*.py
+backend/tests/
