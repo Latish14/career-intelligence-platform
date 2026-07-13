@@ -1,12 +1,11 @@
 # =============================================================================
-# Career Intelligence Platform — Root Dockerfile (backend API)
+# Career Intelligence Platform — Root Dockerfile (Full Stack)
 # =============================================================================
-# Single-container production image for platforms like Railway, Render, Fly.io,
-# or any host that builds from ./Dockerfile at the repo root.
+# Single-container production image for platforms like Railway, Render, Fly.io.
+# Serves the React frontend via nginx and proxies API requests to uvicorn.
 #
 # ----------  Required environment variables  ----------
 #   DATABASE_URL          PostgreSQL connection string
-#                         e.g. postgresql://user:pass@host:5432/dbname?sslmode=require
 #
 # ----------  Optional environment variables  ----------
 #   ADZUNA_APP_ID         Adzuna API application ID   (job scraping)
@@ -16,42 +15,64 @@
 #   MIN_SKILL_CONFIDENCE  Minimum skill confidence      (default: 0.40)
 #   MIN_DEMAND_PCT        Minimum demand percentage     (default: 0.0)
 #   PARTIAL_MATCH         Enable partial skill matching (default: true)
-#   PORT                  Override listening port       (default: 8000)
+#   PORT                  Override listening port       (default: 80)
 #
 # ----------  Build & run  ----------
 #   docker build -t cip .
-#   docker run --rm -p 8000:8000 --env-file backend/.env cip
+#   docker run --rm -p 3000:80 --env-file backend/.env cip
+#   Open http://localhost:3000  (frontend + API)
 # =============================================================================
 
+
+# ── Stage 1: Build the React frontend ────────────────────────────────────────
+FROM node:20-alpine AS frontend-build
+
+WORKDIR /build
+
+COPY frontend/package*.json ./
+RUN npm ci --prefer-offline
+
+COPY frontend/ .
+
+# Empty VITE_API_URL so axios uses relative URLs (nginx proxies to backend)
+ENV VITE_API_URL=""
+RUN npm run build
+
+
+# ── Stage 2: Production image (Python + Nginx) ──────────────────────────────
 FROM python:3.12-slim
 
-# --- System dependencies (PostgreSQL client libs, C compiler for wheels) -----
+# --- System dependencies ----------------------------------------------------
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc \
         libpq-dev \
+        nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# --- Working directory -------------------------------------------------------
+# --- Python dependencies (cached layer) -------------------------------------
 WORKDIR /app
-
-# --- Python dependencies (cached layer — changes only when requirements.txt changes)
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Application code --------------------------------------------------------
-# Copy the backend source
+# --- Backend source ----------------------------------------------------------
 COPY backend/ ./
 
-# Copy the job_engine data directory (referenced by backend via parents[3])
-# In Docker, parents[3] from /app/api/routes/resume_routes.py is "/" so we
-# place job_engine at /job_engine to match the resolved path.
+# --- Job engine data (backend references /job_engine/ via Path.parents[3]) ---
 COPY job_engine/ /job_engine/
 
-# --- Port --------------------------------------------------------------------
-EXPOSE 8000
+# --- Frontend built assets ---------------------------------------------------
+COPY --from=frontend-build /build/dist /usr/share/nginx/html
+
+# --- Nginx config ------------------------------------------------------------
+# Remove default nginx site, add our reverse-proxy config
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 # --- Entrypoint --------------------------------------------------------------
-# Bind to 0.0.0.0 so the container is reachable from outside.
-# PORT env var override is supported by many PaaS providers.
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/entrypoint.sh"]
