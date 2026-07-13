@@ -68,10 +68,11 @@ COPY --from=frontend-build /build/dist /usr/share/nginx/html
 # Remove default nginx site, add our reverse-proxy config
 RUN rm -f /etc/nginx/sites-enabled/default
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+RUN sed -i 's/\r$//' /etc/nginx/conf.d/default.conf
 
 # --- Entrypoint --------------------------------------------------------------
 COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 80
 
